@@ -56,12 +56,13 @@ def make_display_table(cards, num_columns):
         cell_counter += 1
         if cell_counter == num_columns:
             table_rows[row_counter] = html.Tr(row_cells)
-            row_counter += 1  
+            row_counter += 1
             cell_counter = 0
             row_cells = [None] * num_columns
         elif i == len(cards) - 1:
             table_rows[row_counter] = html.Tr(row_cells)
     return table_rows
+
 
 def make_controls():
     UI_BUTTON_STYLE = {'width': '55px', 'padding': '2.5px', 'margin-left': '5px', 'margin-right': '5px', 'background': 'transparent', 'border': 'none'}
@@ -77,21 +78,21 @@ def make_controls():
             ),
             dbc.Button(
                 children=[
-                    html.Img(src=ICONS_DIR + 'skip-to-start.png')
+                    html.Img(src=ICONS_DIR + 'rewind.png')
                 ],
                 id='rewind',
                 style=UI_BUTTON_STYLE
             ),
             dbc.Button(
                 children=[
-                    html.Img(src=ICONS_DIR + 'play.png')
+                    html.Img(src=ICONS_DIR + 'pause.png')
                 ],
                 id='play-pause',
                 style=UI_BUTTON_STYLE
             ),
             dbc.Button(
                 children=[
-                    html.Img(src=ICONS_DIR + 'skip-to-next.png')
+                    html.Img(src=ICONS_DIR + 'fast-forward.png')
                 ],
                 id='fast-forward',
                 style=UI_BUTTON_STYLE

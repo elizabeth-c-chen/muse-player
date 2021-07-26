@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Version 2</title>
+    <title>Muse Player</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cyborg.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom-styling.css') }}">
+</head>
+
+<body>
+    <br>
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <h2>Library</h2>
+                <hr>
+                <ul class="nav nav-pills flex-column nav-fill">
+                    <li class="nav-item"><a class="nav-link" href="/playlists">Playlists</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/artists">Artists</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/albums">Albums</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/songs">Songs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/nowplaying">Now Playing</a></li>
+                </ul>
+            </div>
+            <div class="col-md-10">
+                {% block main_content %}
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

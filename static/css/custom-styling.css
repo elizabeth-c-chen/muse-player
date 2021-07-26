@@ -1,0 +1,286 @@
+@import url('https://fonts.googleapis.com/css2?family=Anonymous+Pro:ital@0;1&display=swap');
+
+/* FROM STYLES.CSS */
+li .nav-item {
+    color: rgb(255, 255, 255);
+    font-size: 14px;
+    text-align: left;
+}
+li .nav-item .nav-link.active,
+.navbar-nav > .active > a {
+    background: rgb(1, 255, 27);
+    color: rgb(0, 0, 0);
+    font-size: 14px;
+    text-align: left;
+}
+
+a.nav-link {
+    color: rgb(255, 255, 255);
+    font-size: 2rem;
+    text-align: left;
+}
+
+.nav-item > a:hover {
+    background: rgb(0, 68, 7);
+    color: white;
+}
+
+
+
+
+/* END STYLES.CSS */
+
+* {
+    font-family: 'Anonymous Pro', monospace;
+}
+
+hr {
+    margin-top   : 1rem;
+    margin-bottom: 2rem;
+    border       : 0;
+    border-top   : 1px solid rgba(255, 255, 255, 0.589)
+}
+
+
+body {
+    margin          : 0;
+    font-family     : 'Anonymous Pro', monospace;
+    font-size       : 1rem;
+    font-weight     : 400;
+    line-height     : 1.1;
+    color           : #bebebe;
+    text-align      : left;
+    background-color: #060606
+}
+
+hr {
+    color: rgb(8, 249, 28);
+}
+
+a {
+    color: rgb(8, 249, 28);
+    background: var(--bs-table-bg);
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.container {
+    max-width: 95%;
+}
+
+.row {
+    max-width: 100%;
+}
+
+.col-sm-2 {
+    color: rgb(8, 249, 28);
+    min-height: 800px;
+    min-width: 15%;
+    max-width: 18%;
+}
+
+.col-md-10 {
+    background: #000000;
+    min-width: 82%;
+    max-width: 85%;
+}
+
+table {
+    width: 100%;
+    table-layout: auto;
+    margin-bottom: 1rem;
+}
+
+.table-responsive {
+    overflow-y: visible; /* so you can scroll down */
+    flex-wrap: wrap;
+}
+
+.table td {
+    padding: 0.75rem;
+}
+
+.card,
+td.card-cell {
+    max-width: 20rem; /* Control image sizing */
+    min-width: 18rem; /* Control image sizing */
+    background: var(--bs-table-bg);
+    /* margin: auto; */
+    margin: 1rem; /* Padding on all sides of card image */
+    display: inline-flex;
+}
+
+.card-img, .card-img-top {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    border-color: transparent;
+}
+
+img .card-img-top .d-block{
+    border-color: transparent;
+    max-width: 20rem;
+    min-width: 18rem;
+}
+
+
+.album-artwork {
+    max-width: 500px;
+    min-width: 200px;
+}
+
+td.song-entry-field {
+    vertical-align: top;
+    width: 13%;
+    height: fit-content;
+    font-size: medium;
+    color: white;
+}
+
+
+.bold-info-text {
+    font-size: medium;
+    color    : #4AF626;
+    line-height: 2.5rem;
+}
+
+.regular-info-text {
+    font-size: medium;
+    color    : white;
+    line-height: 1.5rem;
+}
+
+.display-1 {
+    font-size  : 6rem;
+    font-weight: 300;
+    line-height: 1.2;
+    color      : #4AF626;
+}
+
+.display-2 {
+    font-size  : 5.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+    color      : #4AF626;
+}
+
+.display-3 {
+    font-size  : 4.5rem;
+    font-weight: 300;
+    line-height: 1.2 color: #4AF626;
+}
+
+.display-4 {
+    font-size  : 3.5rem;
+    font-weight: 300;
+    line-height: 1.2;
+    color      : #4AF626;
+}
+
+.display-5 {
+    font-size  : 3 rem;
+    font-weight: 300;
+    line-height: 1.2;
+    color      : #4AF626;
+}
+
+.aligned-page-title {
+    font-size  : 2rem;
+    color      : #4AF626;
+    padding-top: 1.8rem;
+}
+
+h1,
+.h1 {
+    font-size: 4rem;
+    color    : #4AF626;
+}
+
+h2,
+.h2 {
+    font-size: 3rem;
+    color    : #4AF626;
+}
+
+h3,
+.h3 {
+    font-size: 2.5rem;
+    color    : #4AF626;
+}
+
+h4,
+.h4 {
+    font-size: 2rem;
+    color    : #4AF626;
+}
+
+h5,
+.h5 {
+    font-size: 1.5rem;
+    color    : #4AF626;
+}
+
+h6,
+.h6 {
+    font-size: 0.875rem;
+    color    : #4AF626;
+}
+
+
+.nav-tabs .nav-link,
+.nav-pills .nav-link {
+    color: #fff
+}
+
+.nav-pills .nav-link {
+    border-radius: 0.25rem
+}
+
+
+.nav-tabs .nav-link:hover,
+.nav-pills .nav-link:hover {
+    background-color: rgba(0, 37, 2, 0.836)
+}
+
+.nav-tabs .nav-link.disabled,
+.nav-tabs .nav-link.disabled:hover,
+.nav-pills .nav-link.disabled,
+.nav-pills .nav-link.disabled:hover {
+    background-color: transparent;
+    color           : rgba(0, 37, 2, 0.836)
+}
+
+.nav-tabs .nav-link.active,
+.nav-pills .nav-link.active {
+    background-color: #4AF626;
+}
+
+.nav-pills .nav-link.active,
+.nav-pills .show>.nav-link {
+    color           : #000;
+    background-color: #4AF626
+}
+
+
+.lead {
+    font-size  : 1.09375rem;
+    font-weight: 300;
+    color      : white;
+}
+
+.card {
+    position : relative;
+    display              : -webkit-box;
+    display              : -ms-flexbox; 
+    display : block;
+    float: left;
+    -webkit-box-orient : vertical;
+    -webkit-box-direction: normal;
+    -ms-flex-direction : column;
+    flex-direction : row;
+    word-wrap : break-word;
+    background-color : transparent;
+}
+
+

@@ -1,0 +1,35 @@
+{% extends "base-two-col.html" %}
+{% block main_content %}
+<a href="/artists/{{ album.artist }}"><h2>{{ album.title }} – {{ album.artist }}</h2></a>
+<hr>
+<div class="row">
+    <div class="col-md-5">
+        <img class="album-artwork" src="{{ album.cover_art }}">
+    </div>
+    <div class="col-md-7">
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td class="song-entry-field display-6" style="text-align: left; "><b>Track</b></td>
+                        <td class="song-entry-field display-6" style="text-align: left; width: 61%;"><b>Title</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; "><b>Duration</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right;"><b>Plays</b></td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for song in album.songs %}
+                    <tr>
+                        <td class="song-entry-field display-6" style="text-align: left;">{{ song.track_number }}</td>
+                        <td class="song-entry-field display-6" style="text-align: left; width: 61%;">{{ song.title }}</td>
+                        <td class="song-entry-field display-6" style="text-align: right;">{{ song.duration }}</td>
+                        <td class="song-entry-field display-6" style="text-align: right;">{{ song.num_plays }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+                

@@ -1,6 +1,6 @@
 from ffpyplayer.player import MediaPlayer
 import time
-from queue import Queue
+from SongQueue import SongQueue
 import os
 MUSIC_DIR = os.environ.get("MUSIC_DIR")
 
@@ -11,14 +11,15 @@ class MusePlayer:
         self.curr_file = filepath
         self.repeat_type = repeat_type
         self.opts = {'paused': True, 'loop': self.repeat_type}
+        self.crossfade = 5
         self.player = MediaPlayer(
             self.curr_file,
             ff_opts=self.opts
         )
-        self.queue = PlayerQueue()
+        self.queue = SongQueue()
         file = MUSIC_DIR + "/P!nk/The Truth About Love/04 Just Give Me A Reason (feat. Nate Ruess).m4a"
         # self.next_file
-        self.queue.put(file)
+        self.queue.add_song(file)
         self.next_repeat_type = self.repeat_type
 
     # Set / Get methods
@@ -30,11 +31,11 @@ class MusePlayer:
 
     def set_next_repeat_type(self, repeat_type):
         self.next_repeat_type = repeat_type
-
+    
     # Functions for controlling audio player
     def play(self):
         self.player.set_pause(False)
-        while self.player.get_metadata()['duration'] - self.player.get_pts() > 5:
+        while self.player.get_metadata()['duration'] - self.player.get_pts() > self.crossfade:
             time.sleep(1)
             print(self.player.get_metadata()['duration'] - self.player.get_pts())
         self.prep_play_next()
@@ -61,7 +62,7 @@ class MusePlayer:
             next_file = self.curr_file
         else:
             if len(self.queue) > 0:
-                next_file = self.queue.get()
+                next_file = self.queue.get_song()
             else:
                 next_file = MUSIC_DIR + "/Users/elizabethchen/Desktop/music/Maroon 5/Overexposed (Deluxe Version)/02 Payphone (feat. Wiz Khalifa).m4a"
         next_player = MediaPlayer(
@@ -80,29 +81,3 @@ class MusePlayer:
         self.player = next_player
         self.next_repeat_type = self.repeat_type
 
-class PlayerQueue:
-    def __init__(self):
-        self.max_size = 100
-        self.queue = Queue(maxsize=self.max_size)
-        self.size = self.queue.qsize()
-
-    def __len__(self):
-        return self.size
-
-    def get_queue(self):
-        return self.queue
-
-    def put(self, song):
-        self.queue.put(song)
-        self.size += 1
-
-    def get(self):
-        return self.queue.get()
-
-    def clear_queue(self):
-        self.queue = Queue(max_size=self.max_size)
-
-class Playlist:
-    def __init__(self):
-        self.songs_list = []
-    #   self.songs_list = DoublyLinkedList()

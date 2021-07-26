@@ -1,0 +1,35 @@
+{% extends "base-two-col.html" %}
+
+{% block main_content %}
+<a href="{{ page_url }} "><h2>{{ page_title }}</h2></a>
+<hr>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr></tr>
+        </thead>
+        <tbody>
+            <tr>
+                {% for item in content %}
+                <td class="card-cell">
+                    <div class="card">
+                        <a href= "{{ url_for(img_dest, query_param=item.title) }}">
+                            <img class="card-img-top d-block" src="{{ item.img_src }}">
+                        </a>
+                        <a href="{{ url_for(img_dest, query_param=item.title) }}">
+                            <b class="bold-info-text">{{ item.title | truncate(25) }}</b>
+                        </a>
+                        {% if item.subtitle is not none %}
+                        <a href="{{ url_for('show_artists_page', query_param=item.subtitle) }}">
+                            <p class="regular-info-text"> {{ item.subtitle | truncate(25) }} </p>
+                        </a>
+                        {% endif %}
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+{% endblock %}

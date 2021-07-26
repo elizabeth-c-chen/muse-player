@@ -1,0 +1,39 @@
+{% extends "base-two-col.html" %}
+{% block main_content %}
+<a href="/songs"><h2>All Songs</h2></a>
+<hr>
+<div class="table-responsive">
+    <table class="table">
+        <thead>
+            <tr>
+                <td class="song-entry-field display-6" style="text-align: center; width:2%"></td>
+                <td class="song-entry-field display-6" style="text-align: left; width: 31%;"><b>Title</b></td>
+                <td class="song-entry-field display-6" style="text-align: left; width: 19%"><b>Artist</b></td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 20%"><b>Album</b></td>
+                <td class="song-entry-field display-6" style="text-align: right; "><b>Duration</b></td>
+                <td class="song-entry-field display-6" style="text-align: right;"><b>Plays</b></td>
+                <td class="song-entry-field display-6" style="text-align: right; width:2%"><b>Loved</b></td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for song in content %}
+            <tr>
+                <td class="song-entry-field display-6" style="text-align: center; width:4%">
+                    <img src="{{ url_for('static', filename='icons/controls/play.png') }}" style="height:1.5rem;" id="play-pause-icon">
+                </td>
+                <td class="song-entry-field display-6" style="text-align: left; width: 31%;">{{ song.title }}</td>
+                <td class="song-entry-field display-6" style="text-align: left; width: 19%">{{ song.artist }}</td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 20%">{{ song.album }}</td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 9%;">{{ song.duration }}</td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 7%;">{{ song.num_plays }}</td>
+                {% if song.is_favorited == true %} 
+                <td class="song-entry-field display-6 loved-icon" style="text-align: right; width:4%"> <b style="font-size:1.5rem">♥</b></td>
+                {% else %}
+                <td class="song-entry-field display-6 loved-icon" style="text-align: right; width:4%"><b style="font-size:1.5rem">♡</b></td> 
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

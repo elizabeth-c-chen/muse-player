@@ -3,27 +3,37 @@
 <a href="/artists/{{ album.artist }}"><h2>{{ album.title }} – {{ album.artist }}</h2></a>
 <hr>
 <div class="row">
-    <div class="col-md-5">
+    <div class="col-sm-4">
         <img class="album-artwork" src="{{ album.cover_art }}">
     </div>
-    <div class="col-md-7">
+    <div class="col-md-8">
         <div class="table-responsive">
             <table class="table">
                 <thead>
                     <tr>
-                        <td class="song-entry-field display-6" style="text-align: left; "><b>Track</b></td>
-                        <td class="song-entry-field display-6" style="text-align: left; width: 61%;"><b>Title</b></td>
-                        <td class="song-entry-field display-6" style="text-align: right; "><b>Duration</b></td>
-                        <td class="song-entry-field display-6" style="text-align: right;"><b>Plays</b></td>
+                        <td class="song-entry-field display-6" style="text-align: center; width:9%;"><b>Play</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 12%;"><b>Track #</b></td>
+                        <td class="song-entry-field display-6" style="text-align: left; width: 40%;"><b>Title</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 15%;"><b>Duration</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 11%;"><b>Plays</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 13%;"><b>Loved</b></td>
                     </tr>
                 </thead>
                 <tbody>
                     {% for song in album.songs %}
                     <tr>
-                        <td class="song-entry-field display-6" style="text-align: left;">{{ song.track_number }}</td>
-                        <td class="song-entry-field display-6" style="text-align: left; width: 61%;">{{ song.title }}</td>
-                        <td class="song-entry-field display-6" style="text-align: right;">{{ song.duration }}</td>
-                        <td class="song-entry-field display-6" style="text-align: right;">{{ song.num_plays }}</td>
+                        <td class="song-entry-field display-6" style="text-align: center; width:9%">
+                            <img src="{{ url_for('static', filename='icons/controls/play.png') }}" style="height:1.25rem;" id="play-pause-icon">
+                        </td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 12%;">{{ song.track_number }}</td>
+                        <td class="song-entry-field display-6" style="text-align: left; width: 40%;">{{ song.title }}</td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 15%;">{{ song.duration }}</td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 11%;">{{ song.num_plays }}</td>
+                        {% if song.is_favorited == true %} 
+                        <td class="song-entry-field display-6 loved-icon" style="text-align: right; width: 13%;"> <b style="font-size:1.5rem">♥</b></td>
+                        {% else %}
+                        <td class="song-entry-field display-6 loved-icon" style="text-align: right; width: 13%;"><b style="font-size:1.5rem">♡</b></td> 
+                        {% endif %}
                     </tr>
                     {% endfor %}
                 </tbody>

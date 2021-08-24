@@ -17,11 +17,11 @@
                             <img class="card-img-top d-block" src="{{ item.img_src }}">
                         </a>
                         <a href="{{ url_for(img_dest, query_param=item.title) }}">
-                            <b class="bold-info-text">{{ item.title | truncate(25) }}</b>
+                            <b class="bold-info-text">{{ item.title }}</b>
                         </a>
                         {% if item.subtitle is not none %}
                         <a href="{{ url_for('show_artists_page', query_param=item.subtitle) }}">
-                            <p class="regular-info-text"> {{ item.subtitle | truncate(25) }} </p>
+                            <p class="regular-info-text"> {{ item.subtitle }} </p>
                         </a>
                         {% endif %}
                     </div>

@@ -1,0 +1,105 @@
+{% extends "base-two-col.html" %}
+{% block javascript %}
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<!-- <script src='{{ url_for("static", filename="js/jquery.keyframes.js") }}'></script> -->
+<script>
+window.setInterval(
+    function(){ 
+        fetch('/timer', {method: 'post'})
+        .then(response => response.json())
+        .then(
+            function(response) {
+                const pixelProportion = 450 * response.elapsedSeconds / response.durationSeconds;
+                document.getElementById("media-time-elapsed").innerHTML = response.elapsedTime;
+                document.getElementById("media-time-remaining").innerHTML = response.remainingTime;
+               // $("#seekbar").css('width', pixelProportion +'px');
+                if (response.songHasChanged === 1) {
+                    $.post("/changesong").done(function(){});
+                    $.get("/nowplaying").done(function(){
+                        window.location.href = window.location.href;
+                    });
+                }
+            }
+        );
+    },
+    1000
+    );
+
+const playOrPause = function(){
+    $.post("/play").done(function(){});
+    return
+};
+
+const rewind = function(){
+    $.post("/rewind").done(function(){});
+    return
+};
+
+const fastForward = function(){
+    $.post("/fast-forward").done(function(){});
+    return
+};
+
+const shuffle = function(){
+    $.post("/shuffle").done(function(){});
+    return
+};
+
+const changeRepeatMode = function(){
+    $.post("/change-repeat").done(function(){});
+    return
+};
+</script>
+{% endblock %}
+
+{% block main_content %}
+<a href="/nowplaying }}"><h2>Now Playing</h2></a>
+<hr>
+<div class="now-playing-card">
+    <img class="card-img-top d-block" id="now-playing-artwork" src="{{ player_content.img_src }}">
+    <div class="media-info-container">
+        <a href="{{ song_link_dest }}" class="player-title" id="media-title"><b>{{ now_playing.title }}</b></a>
+        <br>
+        <a href="{{ artist_link_dest }}" class="player-subtitle" id="media-artist">{{ now_playing.artist }}</a>
+    </div>
+    <div class="progress-container">
+        <div class="table-responsive-time-text">
+            <table class="progress-time-text">
+                <thead>
+                    <tr>
+                        <td colspan="2">
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" id="seekbar" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="media-time-text-container"><p id="media-time-elapsed" style="font-size: 1.8vw; text-align: left; margin-right: 5%;"></p></td>
+                        <td class="media-time-text-container"><p id="media-time-remaining"style="font-size: 1.8vw; text-align: right; margin-right: 8%;"></p> </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+      </div>
+    <div class="controls">
+        <button class="media-button">
+            <img class="media-button-img" id="shuffle" src="{{ url_for('static', filename='icons/controls/shuffle-off.png') }}" onclick="shuffle()">
+        </button>
+        <button class="media-button">
+            <img class="media-button-img" id="rewind" src="{{ url_for('static', filename='icons/controls/rewind.png') }}"  onclick="rewind()">
+        </button>
+        <button class="media-button">
+            <img class="media-button-img" id="play-pause" src="{{ url_for('static', filename='icons/controls/play.png') }}" onclick="playOrPause()">
+        </button>
+        <button class="media-button">
+            <img class="media-button-img" id="fast-forward" src="{{ url_for('static', filename='icons/controls/fast-forward.png') }}" onclick="fastForward()">
+        </button>
+        <button class="media-button">
+            <img class="media-button-img" id="repeat" src="{{ url_for('static', filename='icons/controls/repeat-all.png') }}" onclick="changeRepeatMode()">
+        </button>
+    </div>
+</div>
+{% endblock %}
+                

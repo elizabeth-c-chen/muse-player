@@ -1,8 +1,6 @@
 .DS_Store
 .vscode/
 .ipynb_checkpoints/
-assets/
-music/
-__pycache__/
 local/
+__pycache__/
 old/

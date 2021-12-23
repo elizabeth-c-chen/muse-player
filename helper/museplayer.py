@@ -40,7 +40,7 @@ class MusePlayer:
             'paused': True,  # always initialize upon launch with a paused player
             'loop': repeat_type,
             'vn': True,
-            'sn': True, 
+            'sn': True,
             'acodec': self.now_playing.codec
         }
         # Initialize with an empty queue that can hold future songs

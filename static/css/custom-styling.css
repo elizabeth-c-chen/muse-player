@@ -34,7 +34,7 @@ hr {
     margin-top: 1rem;
     margin-bottom: 2rem;
     border: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.589);
+    border-top: 1px solid rgb(255, 255, 255);
     color: rgb(1, 255, 27);
 }
 
@@ -140,7 +140,7 @@ body {
     line-height: 1.1;
     color: #bebebe;
     text-align: left;
-    background-color: #060606;
+    /* background-color: #060606; */
 }
 
 a {
@@ -166,7 +166,7 @@ a {
 }
 
 .col-md-10 {
-    background: #000000;
+    /* background: #000000; */
     min-width: 82%;
     max-width: 85%;
 }
@@ -233,8 +233,8 @@ img#now-playing-artwork {
 }
 
 .media-button {
-    color: black;
-    background: black;
+    color: var(--bs-body-bg);
+    background: var(--bs-body-bg);
     border: 1px solid rgba(1, 255, 26, 0.596);
     border-radius: 4px;
 }
@@ -244,7 +244,7 @@ img#now-playing-artwork {
     padding: 2.5px;
     margin-left: 5px;
     margin-right: 5px;
-    background: black;
+    /* background: black; */
     border: none;
 }
 
@@ -392,18 +392,18 @@ h6,
     border-radius: 0.25rem;
 }
 
-.nav-tabs .nav-link:hover,
+/* .nav-tabs .nav-link:hover,
 .nav-pills .nav-link:hover {
     background-color: rgba(0, 37, 2, 0.836);
-}
+} */
 
-.nav-tabs .nav-link.disabled,
+/* .nav-tabs .nav-link.disabled,
 .nav-tabs .nav-link.disabled:hover,
 .nav-pills .nav-link.disabled,
 .nav-pills .nav-link.disabled:hover {
     background-color: transparent;
     color: rgba(0, 37, 2, 0.836);
-}
+} */
 
 .nav-tabs .nav-link.active,
 .nav-pills .nav-link.active {

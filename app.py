@@ -1,9 +1,9 @@
 from flask import Flask, url_for, render_template, redirect, request
 from flask_pymongo import PyMongo
 from flask_bootstrap import Bootstrap
-from helper.utils import make_artist_cards, make_album_cards,  make_album_content, \
+from helper.ContentGenerator import make_artist_cards, make_album_cards,  make_album_content, \
    make_artist_view_cards, make_songs_table, make_now_playing_card
-from helper.museplayer import MusePlayer
+from helper.MusePlayer import MusePlayer
 import logging 
 import sys 
 
@@ -155,20 +155,20 @@ def bg_fastforward():
     return "success"
 
 
-@app.route("/shuffle", methods=['POST'])
-def bg_shuffle():
-    if request.method == "POST":
-        pass
-       # muse_player.shuffle_queue()
-    return "success"
+# @app.route("/shuffle", methods=['POST'])
+# def bg_shuffle():
+#     if request.method == "POST":
+#         pass
+#        # muse_player.shuffle_queue()
+#     return "success"
 
 
-@app.route("/change-repeat", methods=['POST'])
-def bg_alter_repeat_mode():
-    if request.method == "POST":
-        pass
-       # muse_player.set_next_repeat_type()
-    return "success"
+# @app.route("/change-repeat", methods=['POST'])
+# def bg_alter_repeat_mode():
+#     if request.method == "POST":
+#         pass
+#        # muse_player.set_next_repeat_type()
+#     return "success"
 
 
 if __name__ == "__main__":

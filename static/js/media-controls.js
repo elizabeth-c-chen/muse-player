@@ -35,14 +35,14 @@ const fastForward = function(){
     return
 };
 
-const shuffle = function(){
-    $.post("/shuffle").done(function(){});
-    return
-};
+// const shuffle = function(){
+//     $.post("/shuffle").done(function(){});
+//     return
+// };
 
-const changeRepeatMode = function(){
-    $.post("/change-repeat").done(function(){});
-    return
-};
+// const changeRepeatMode = function(){
+//     $.post("/change-repeat").done(function(){});
+//     return
+// };
 
 

@@ -1,5 +1,6 @@
-from datetime import datetime
 from queue import Queue
+from datetime import datetime
+
 
 def format_seconds(num_seconds):
     minutes = int(num_seconds//60)

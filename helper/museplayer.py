@@ -1,12 +1,15 @@
 # Imports
 import time
+import threading
 import ffpyplayer.tools
 from ffpyplayer.player import MediaPlayer
 from datetime import datetime
 from pytz import timezone
-from .datastructures import SongQueue, SongItem
+from .DataStructures import SongQueue, SongItem
 from pymongo import MongoClient
-import threading
+
+
+# TODO fix autoplay_next/threading
 
 # ffpyplayer log level
 ffpyplayer.tools.set_loglevel("info") # change to error for production
@@ -147,6 +150,14 @@ class MusePlayer:
         self.song_has_changed = 0
         
     def autoplay_next(self):
+        """
+        ATTENTION @me 
+        autoplay function is broken
+        wait_play issue
+        problem w/ threading/sleeper function 
+        creating next_player
+        #TODO go here first
+        """
         self.song_has_changed = 1 # will trigger page reload via javascript
         self.player = self.next_player
         self.now_playing = self.next_song

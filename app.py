@@ -1,11 +1,13 @@
-from flask import Flask, url_for, render_template, redirect, request
+import sys
+import logging
 from flask_pymongo import PyMongo
 from flask_bootstrap import Bootstrap
-from helper.ContentGenerator import make_artist_cards, make_album_cards,  make_album_content, \
+from flask import Flask, url_for, render_template, redirect, request
+from helper.muse_player import MusePlayer
+from helper.content_generator import make_artist_cards, make_album_cards,  make_album_content, \
    make_artist_view_cards, make_songs_table, make_now_playing_card
-from helper.MusePlayer import MusePlayer
-import logging 
-import sys 
+
+
 
 app = Flask(__name__)
 Bootstrap(app)

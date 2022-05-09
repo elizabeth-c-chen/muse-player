@@ -5,7 +5,7 @@ import ffpyplayer.tools
 from ffpyplayer.player import MediaPlayer
 from datetime import datetime
 from pytz import timezone
-from .DataStructures import SongQueue, SongItem
+from .data_structures import SongQueue, SongItem
 from pymongo import MongoClient
 
 

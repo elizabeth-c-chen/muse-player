@@ -1,6 +1,6 @@
 import base64
 from urllib.parse import unquote
-from .DataStructures import AlbumItem, SongItem
+from .data_structures import AlbumItem, SongItem
 
 
 class CardItem:

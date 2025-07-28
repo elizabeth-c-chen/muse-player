@@ -77,3 +77,8 @@ def make_artist_view_cards(artists, albums, artist_name):
 def make_songs_table(songs):
     results = songs.find({}).collation({'locale': 'en'}).sort('artistName', 1)
     return [SongItem(song) for song in results]
+
+
+def make_playlist_cards(playlists):
+    results = playlists.find({}).sort('playlistName', 1)
+    return None#[PlaylistItem(playlist) for playlist in results]

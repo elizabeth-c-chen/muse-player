@@ -61,8 +61,10 @@ class DoublyLinkedSongList:
         return self._length
 
     def get_last(self):
-        """ Returns the last item (psedu-node is skipped).
-        Raises IndexError when no item exists. """
+        """
+        Returns the last item (pseudo-node is skipped).
+        Raises IndexError when no item exists.
+        """
         if self._length == 0:
             raise IndexError("Try to get item from an empty playlist")
         return self.next_song.prev
@@ -136,7 +138,7 @@ class Playlist:
 
     def items(self):
         """
-        Return all song_id, song_item pairs in order
+        Return all song_id, song_item pairs in order.
         """
         kv_pairs = []
         curr_song = self.songs_list.prev_song
@@ -147,8 +149,8 @@ class Playlist:
 
 
 class SongQueue:
-    def __init__(self):
-        self.capacity = 100
+    def __init__(self, max_capacity=100):
+        self.capacity = max_capacity
         self.queue = Queue(maxsize=self.capacity)
 
     def __len__(self):

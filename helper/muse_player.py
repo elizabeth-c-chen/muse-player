@@ -48,6 +48,7 @@ class MusePlayer:
         }
         # Initialize with an empty queue that can hold future songs
         self.queue = SongQueue()
+        # Maybe want to save queue state upon quit and then restore?? 
         # The media player object
         self.player = MediaPlayer(
             filename=self.now_playing.file_path,

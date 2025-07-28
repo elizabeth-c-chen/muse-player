@@ -44,8 +44,21 @@ def show_homepage():
 
 
 @app.route("/playlists")
-def show_playlists():
+def show_all_playlists():
     return redirect("/artists")
+    
+
+@app.route("/playlists/<query_param>")
+def show_playlist_page():
+    playlist_content =  None # TODO
+    return redirect("/artists")
+    # return render_template(
+    #     'playlist-view.html',
+    #     page_url=url_for('show_all_playlists'),
+    #     iimg_dest='show_playlists_page',
+    #     page_title='Playlists',
+    #     content=playlist_content
+    # )
 
 
 @app.route("/artists")

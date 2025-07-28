@@ -1,10 +1,10 @@
 {% extends "base-two-col.html" %}
 {% block main_content %}
-<a href="/artists/{{ album.artist }}"><h2>{{ album.title }} – {{ album.artist }}</h2></a>
+<a href="/playlists/{{ playlist.title }}"><h2>{{ playlist.title }}</h2></a>
 <hr>
 <div class="row">
     <div class="col-sm-4">
-        <img class="album-artwork" src="{{ album.cover_art }}">
+        <img class="playlist-artwork" src="{{ playlist.cover_art }}">
     </div>
     <div class="col-md-8">
         <div class="table-responsive">
@@ -20,12 +20,12 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for song in album.songs %}
+                    {% for song in playlist.songs %}
                     <tr>
                         <td class="song-entry-field display-6" style="text-align: center; width:9%">
                             <img src="{{ url_for('static', filename='icons/controls/play.png') }}" style="height:1.25rem;" id="play-pause-icon">
                         </td>
-                        <td class="song-entry-field display-6" style="text-align: right; width: 12%;">{{ song.track_number }}</td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 12%;">{{ song.playlist_track_number }}</td>
                         <td class="song-entry-field display-6" style="text-align: left; width: 40%;">{{ song.title }}</td>
                         <td class="song-entry-field display-6" style="text-align: right; width: 15%;">{{ song.duration }}</td>
                         <td class="song-entry-field display-6" style="text-align: right; width: 11%;">{{ song.num_plays }}</td>

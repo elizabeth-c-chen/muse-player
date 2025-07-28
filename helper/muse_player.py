@@ -34,14 +34,14 @@ def update_num_plays(db_songs_collection, song_to_update: SongItem):
 
 
 class MusePlayer:
-    def __init__(self, repeat_type=1):
+    def __init__(self, repeat_mode=1, shuffle_mode=0):
         # Initialize with a random song!
         rand_song = songs.aggregate([{"$sample": {"size": 1}}]).next()
         self.now_playing = SongItem(rand_song)
         # ff_opts 
         options = {
             'paused': True,  # always initialize upon launch with a paused player
-            'loop': repeat_type,
+            'loop': repeat_mode,
             'vn': True,
             'sn': True,
             'acodec': self.now_playing.codec
@@ -54,10 +54,12 @@ class MusePlayer:
             filename=self.now_playing.file_path,
             ff_opts=options
         )
+        self.repeat_mode = repeat_mode
+        self.shuffle_mode = shuffle_mode
         # Thread 
         self.wait_play = threading.Thread(target=self.sleeper_function, args=())
         # If repeat mode is changed during playback, this will update and inform the next player
-        self.next_repeat_type = repeat_type
+        self.next_repeat_mode = repeat_mode
         self.next_player = None
         self.next_song = None
         self.song_has_changed = 0
@@ -66,11 +68,20 @@ class MusePlayer:
     def get_player(self):
         return self.player
     
+    def is_playing(self):
+        return not self.player.get_pause()
+
     def get_queue(self):
         return self.queue
     
     def get_now_playing(self):
         return self.now_playing
+
+    def get_repeat_mode(self):
+        return self.repeat_mode 
+    
+    def get_shuffle_mode(self):
+        return self.shuffle_mode
 
     def get_song_has_changed(self):
         return self.song_has_changed
@@ -106,15 +117,30 @@ class MusePlayer:
         if self.player.get_pause() is False:
             self.player.seek(pts=-10, relative=True)
     
-    def set_next_repeat_type(self, new_repeat_type):
-        self.next_repeat_type = new_repeat_type
+    def set_next_repeat_mode(self, new_repeat_mode):
+        self.next_repeat_mode = new_repeat_mode
     
+    def toggle_shuffle_mode(self):
+        if self.shuffle_mode == 0: # off
+            self.shuffle_mode = 1 # off to on
+        elif self.shuffle_mode == 1: # on
+            self.shuffle_mode = 0  # on to off
+        return self.shuffle_mode
+    
+    def toggle_repeat_mode(self):
+        if self.next_repeat_mode == 0:
+            self.next_repeat_mode = 1  # 'none' → 'all'
+        elif self.next_repeat_mode == 1:
+            self.next_repeat_mode = 2  # 'all' → 'one'
+        else:
+            self.next_repeat_mode = 0  # 'one' → 'none'
+        return self.next_repeat_mode  # return it so frontend can display the new state
 
     # Create player for a given song (used only after initialization)
     def make_new_player(self, song: SongItem):
         options = {
             'paused': True, 
-            'loop': self.next_repeat_type,
+            'loop': self.next_repeat_mode,
             'vn': True,
             'sn': True, 
             'acodec': song.codec
@@ -136,9 +162,9 @@ class MusePlayer:
             self.player.set_pause(True)
 
     def set_next_song(self):
-        if self.next_repeat_type == 0: # repeat same song infinitely
+        if self.next_repeat_mode == 0: # repeat same song infinitely
             next_song = self.now_playing
-        elif self.next_repeat_type == 1: # play current song just once
+        elif self.next_repeat_mode == 1: # play current song just once
             if len(self.queue) > 0: # get song from queue if queue is not empty
                 next_song = self.queue.get_song()
             else: # if queue is empty, play something random

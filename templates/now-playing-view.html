@@ -1,54 +1,150 @@
 {% extends "base-two-col.html" %}
 {% block javascript %}
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<!-- <script src='{{ url_for("static", filename="js/jquery.keyframes.js") }}'></script> -->
+<!-- <script src="{{ url_for('static', filename='js/media-controls.js') }}"></script> -->
+
 <script>
-    window.setInterval(
-        function () {
-            fetch('/timer', { method: 'post' })
-                .then(response => response.json())
-                .then(
-                    function (response) {
-                        const pixelProportion = 450 * response.elapsedSeconds / response.durationSeconds;
-                        document.getElementById("media-time-elapsed").innerHTML = response.elapsedTime;
-                        document.getElementById("media-time-remaining").innerHTML = response.remainingTime;
-                        // $("#seekbar").css('width', pixelProportion +'px');
-                        if (response.songHasChanged === 1) {
-                            $.post("/changesong").done(function () { });
-                            $.get("/nowplaying").done(function () {
-                                window.location.href = window.location.href;
-                            });
-                        }
-                    }
-                );
-        },
-        1000
-    );
+const post = (endpoint) => fetch(endpoint, { method: "POST" });
 
-    const playOrPause = function () {
-        $.post("/play").done(function () { });
-        return
-    };
+function playOrPause() {
+  fetch("/play", { method: "POST" })
+    .then(response => response.json())
+    .then(data => {
+      const icon = document.getElementById("play-pause-icon");
 
-    const rewind = function () {
-        $.post("/rewind").done(function () { });
-        return
-    };
+      const currentlyPlaying = icon.dataset.playing === "true";
+      icon.dataset.playing = (!currentlyPlaying).toString();
 
-    const fastForward = function () {
-        $.post("/fast-forward").done(function () { });
-        return
-    };
+      icon.src = currentlyPlaying
+        ? "/static/icons/controls/play.png"
+        : "/static/icons/controls/pause.png";
+    })
+    .catch(error => {
+      console.error("Error toggling play/pause:", error);
+    });
+}
 
-    const shuffle = function () {
-        $.post("/shuffle").done(function () { });
-        return
-    };
+const rewind = () => post("/rewind");
 
-    const changeRepeatMode = function () {
-        $.post("/change-repeat").done(function () { });
-        return
-    };
+const fastForward = () => post("/fast-forward");
+
+function changeRepeatMode() {
+    fetch("/change-repeat", { method: "POST" })
+        .then(response => response.json())
+        .then(data => {
+            const mode = data.new_mode;  // e.g. "repeat_all"
+            const repeatIcon = document.getElementById("repeat-icon");
+
+            const iconMap = {
+                "repeat_none": "/static/icons/controls/repeat-off.png",
+                "repeat_all": "/static/icons/controls/repeat-all.png",
+                "repeat_one": "/static/icons/controls/repeat-one-on.png"
+            };
+
+            repeatIcon.src = iconMap[mode];
+        })
+        .catch(error => {
+            console.error("Error updating repeat mode:", error);
+        });
+}
+
+function toggleShuffle() {
+  fetch("/shuffle", { method: "POST" })
+    .then(response => response.json())
+    .then(data => {
+        const mode = data.new_mode; 
+        const shuffleIcon = document.getElementById("shuffle-icon");
+
+        const iconMap = {
+          "shuffle_on": "/static/icons/controls/shuffle-on.png",
+          "shuffle_off": "/static/icons/controls/shuffle-off.png"
+        };
+
+        shuffleIcon.src = iconMap[mode];
+    })
+    .catch(error => {
+        console.error("Error updating shuffle mode:", error);
+    });
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const shuffleIcon = document.getElementById("shuffle-icon");
+  const mode = "{{ shuffle_mode }}";
+  const iconMap = {
+    "shuffle_on": "/static/icons/controls/shuffle-on.png",
+    "shuffle_off": "/static/icons/controls/shuffle-off.png"
+  };
+  if (shuffleIcon && mode in iconMap) {
+    shuffleIcon.src = iconMap[mode];
+  }
+});
+
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const repeatIcon = document.getElementById("repeat-icon");
+  const mode = "{{ repeat_mode }}";
+  const iconMap = {
+    "repeat_none": "/static/icons/controls/repeat-off.png",
+    "repeat_all": "/static/icons/controls/repeat-all.png",
+    "repeat_one": "/static/icons/controls/repeat-one-on.png"
+  };
+  if (repeatIcon && mode in iconMap) {
+    repeatIcon.src = iconMap[mode];
+  }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const playPauseIcon = document.getElementById("play-pause-icon");
+  const isPlaying = playPauseIcon?.dataset?.playing === "true";
+  playPauseIcon.src = isPlaying
+    ? "/static/icons/controls/pause.png"
+    : "/static/icons/controls/play.png";
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const shuffleIcon = document.getElementById("shuffle-icon");
+  const isShuffling = shuffleIcon?.dataset?.shuffling === "true";
+  shuffleIcon.src = isShuffling
+    ? "/static/icons/controls/shuffle-on.png"
+    : "/static/icons/controls/shuffle-off.png";
+});
+
+
+async function updateMediaTimer() {
+  try {
+    const response = await fetch('/timer', { method: 'POST' });
+    const data = await response.json();
+
+    const { elapsedSeconds, durationSeconds, elapsedTime, remainingTime, songHasChanged } = data;
+    const pixelProportion = 450 * elapsedSeconds / durationSeconds;
+
+    // Update time display
+    document.getElementById("media-time-elapsed").textContent = elapsedTime;
+    document.getElementById("media-time-remaining").textContent = remainingTime;
+
+    // Update seek bar width
+    const seekbar = document.getElementById("seekbar");
+    if (seekbar) {
+      seekbar.style.width = `${pixelProportion}px`;
+    }
+
+    // If song changed, refresh page
+    if (songHasChanged === 1) {
+      await fetch("/changesong", { method: 'POST' });
+      await fetch("/nowplaying");
+      window.location.reload(); // reloads current page
+    }
+
+  } catch (error) {
+    console.error("Failed to update media timer:", error);
+  }
+}
+
+// Run every second
+setInterval(updateMediaTimer, 1000);
+
 </script>
 {% endblock %}
 
@@ -93,25 +189,44 @@
         </div>
     </div>
     <div class="controls">
-        <button class="media-button">
-            <img class="media-button-img" id="shuffle"
-                src="{{ url_for('static', filename='icons/controls/shuffle-off.png') }}" onclick="shuffle()">
+        <button class="media-button" onclick="toggleShuffle()">
+            <img
+                class="media-button-img"
+                id="shuffle-icon"
+                data-shuffling="{{ 'true' if now_playing.shuffle_mode else 'false' }}"
+                src="{{ url_for('static', filename='icons/controls/shuffle-on.png' if now_playing.shuffle_mode else 'icons/controls/shuffle-off.png') }}"
+                
+            />
         </button>
-        <button class="media-button">
+
+        <button class="media-button" onclick="rewind()">
             <img class="media-button-img" id="rewind"
-                src="{{ url_for('static', filename='icons/controls/rewind.png') }}" onclick="rewind()">
+                src="{{ url_for('static', filename='icons/controls/rewind.png') }}">
         </button>
-        <button class="media-button">
-            <img class="media-button-img" id="play-pause"
-                src="{{ url_for('static', filename='icons/controls/play.png') }}" onclick="playOrPause()">
+
+        <button class="media-button" onclick="playOrPause()">
+            <img
+                class="media-button-img"
+                id="play-pause-icon"
+                data-playing="{{ 'true' if now_playing.is_playing else 'false' }}"
+                src="{{ url_for('static', filename='icons/controls/play.png') }}"
+                alt="play/pause"
+            >
         </button>
-        <button class="media-button">
+
+        <button class="media-button"  onclick="fastForward()">
             <img class="media-button-img" id="fast-forward"
-                src="{{ url_for('static', filename='icons/controls/fast-forward.png') }}" onclick="fastForward()">
+                src="{{ url_for('static', filename='icons/controls/fast-forward.png') }}">
         </button>
-        <button class="media-button">
-            <img class="media-button-img" id="repeat"
-                src="{{ url_for('static', filename='icons/controls/repeat-all.png') }}" onclick="changeRepeatMode()">
+
+        <button class="media-button" onclick="changeRepeatMode()">
+            <img
+                class="media-button-img"
+                id="repeat-icon"
+                data-repeat-mode="{{ repeat_mode }}"
+                src="{{ url_for('static', filename='icons/controls/repeat-off.png') }}"
+                alt="repeat"
+            >
         </button>
     </div>
 </div>

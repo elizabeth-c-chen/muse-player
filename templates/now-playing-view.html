@@ -4,29 +4,120 @@
 <!-- <script src="{{ url_for('static', filename='js/media-controls.js') }}"></script> -->
 
 <script>
+
+async function updateSongInfoIfChanged(changed, data) {
+  if (changed) {
+    try {
+   
+      // Update artwork
+      document.getElementById('now-playing-artwork').src = data.album_art;
+
+      // Update title and artist
+      document.getElementById('media-title').textContent = data.title;
+      document.getElementById('media-artist').textContent = data.artist;
+
+      // Maintain proper state for repeat icon
+      const repeatIcon = document.getElementById("repeat-icon");
+      const repeatIconMap = {
+          "repeat_none": "/static/icons/controls/repeat-off.png",
+          "repeat_all": "/static/icons/controls/repeat-all.png",
+          "repeat_one": "/static/icons/controls/repeat-one-on.png"
+      };
+      repeatIcon.src = repeatIconMap[data.repeat_mode];
+
+      // Maintain proper state for shuffle icon
+      const shuffleIcon = document.getElementById("shuffle-icon");
+      const shuffleIconMap = {
+        "shuffle_on": "/static/icons/controls/shuffle-on.png",
+        "shuffle_off": "/static/icons/controls/shuffle-off.png"
+      };
+      shuffleIcon.src = shuffleIconMap[data.shuffle_mode];
+      
+      window.location.reload(); // reloads current page
+    } catch (e) {
+      console.error('Failed to update song info:', e);
+    }
+  }
+}
+
+let previousArtist = localStorage.getItem('previousArtist') || null;
+let previousTitle = localStorage.getItem('previousTitle') || null;
+let updateTimeout = null;
+const DEBOUNCE_DELAY = 0;
+
+async function updateMediaTimer() {
+  try {
+    const response = await fetch('/timer', { method: 'POST' });
+    const data = await response.json();
+
+    const { artist, title, album_art, elapsed_time, remaining_time, elapsed_seconds, remaining_seconds,  duration_seconds , is_playing, shuffle_mode, repeat_mode} = data;
+    const pixel_proportion = 450 * elapsed_seconds / duration_seconds;
+
+    // Maintain proper status of play/pause icon in UI
+    const play_pause_icon = document.getElementById("play-pause-icon");
+    const isPlaying = data.is_playing === true;
+    play_pause_icon.dataset.playing = isPlaying.toString();
+    play_pause_icon.src = isPlaying
+      ? "/static/icons/controls/pause.png"
+      : "/static/icons/controls/play.png";
+
+
+    // Update time display
+    document.getElementById("media-time-elapsed").textContent = elapsed_time;
+    document.getElementById("media-time-remaining").textContent = remaining_time;
+
+    // Update seek bar width
+    const seekbar = document.getElementById("seekbar");
+    if (seekbar) {
+      seekbar.style.width = `${pixel_proportion}px`;
+    }
+
+    // Update title/artist and artwork only if song has changed 
+    const songChanged = (artist !== previousArtist) || (title !== previousTitle);
+    
+    // If song changed, refresh content in now playing view 
+    if (songChanged) {
+      if (updateTimeout) {
+        clearTimeout(updateTimeout);
+      }
+      updateTimeout = setTimeout(async () => {
+        previousArtist = artist;
+        previousTitle = title;
+        // Save new song info in localStorage
+        localStorage.setItem('previousArtist', artist);
+        localStorage.setItem('previousTitle', title);
+        await updateSongInfoIfChanged(true, data);
+      }, DEBOUNCE_DELAY);
+    }
+  } catch (error) {
+    console.error("Failed to update media timer:", error);
+  }
+}
+
+// Run every second
+setInterval(updateMediaTimer, 1000);
+
 const post = (endpoint) => fetch(endpoint, { method: "POST" });
+
+const rewind = () => post("/rewind");
+
+const fastForward = () => post("/fast-forward");
 
 function playOrPause() {
   fetch("/play", { method: "POST" })
     .then(response => response.json())
     .then(data => {
       const icon = document.getElementById("play-pause-icon");
-
-      const currentlyPlaying = icon.dataset.playing === "true";
-      icon.dataset.playing = (!currentlyPlaying).toString();
-
-      icon.src = currentlyPlaying
-        ? "/static/icons/controls/play.png"
-        : "/static/icons/controls/pause.png";
+      const isPlaying = data.is_playing === true;
+      icon.dataset.playing = isPlaying.toString();
+      icon.src = isPlaying
+        ? "/static/icons/controls/pause.png"
+        : "/static/icons/controls/play.png";
     })
     .catch(error => {
       console.error("Error toggling play/pause:", error);
     });
 }
-
-const rewind = () => post("/rewind");
-
-const fastForward = () => post("/fast-forward");
 
 function changeRepeatMode() {
     fetch("/change-repeat", { method: "POST" })
@@ -34,13 +125,11 @@ function changeRepeatMode() {
         .then(data => {
             const mode = data.new_mode;  // e.g. "repeat_all"
             const repeatIcon = document.getElementById("repeat-icon");
-
             const iconMap = {
                 "repeat_none": "/static/icons/controls/repeat-off.png",
                 "repeat_all": "/static/icons/controls/repeat-all.png",
                 "repeat_one": "/static/icons/controls/repeat-one-on.png"
             };
-
             repeatIcon.src = iconMap[mode];
         })
         .catch(error => {
@@ -54,97 +143,16 @@ function toggleShuffle() {
     .then(data => {
         const mode = data.new_mode; 
         const shuffleIcon = document.getElementById("shuffle-icon");
-
         const iconMap = {
           "shuffle_on": "/static/icons/controls/shuffle-on.png",
           "shuffle_off": "/static/icons/controls/shuffle-off.png"
         };
-
         shuffleIcon.src = iconMap[mode];
     })
     .catch(error => {
         console.error("Error updating shuffle mode:", error);
     });
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  const shuffleIcon = document.getElementById("shuffle-icon");
-  const mode = "{{ shuffle_mode }}";
-  const iconMap = {
-    "shuffle_on": "/static/icons/controls/shuffle-on.png",
-    "shuffle_off": "/static/icons/controls/shuffle-off.png"
-  };
-  if (shuffleIcon && mode in iconMap) {
-    shuffleIcon.src = iconMap[mode];
-  }
-});
-
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const repeatIcon = document.getElementById("repeat-icon");
-  const mode = "{{ repeat_mode }}";
-  const iconMap = {
-    "repeat_none": "/static/icons/controls/repeat-off.png",
-    "repeat_all": "/static/icons/controls/repeat-all.png",
-    "repeat_one": "/static/icons/controls/repeat-one-on.png"
-  };
-  if (repeatIcon && mode in iconMap) {
-    repeatIcon.src = iconMap[mode];
-  }
-});
-
-
-document.addEventListener("DOMContentLoaded", () => {
-  const playPauseIcon = document.getElementById("play-pause-icon");
-  const isPlaying = playPauseIcon?.dataset?.playing === "true";
-  playPauseIcon.src = isPlaying
-    ? "/static/icons/controls/pause.png"
-    : "/static/icons/controls/play.png";
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-  const shuffleIcon = document.getElementById("shuffle-icon");
-  const isShuffling = shuffleIcon?.dataset?.shuffling === "true";
-  shuffleIcon.src = isShuffling
-    ? "/static/icons/controls/shuffle-on.png"
-    : "/static/icons/controls/shuffle-off.png";
-});
-
-
-async function updateMediaTimer() {
-  try {
-    const response = await fetch('/timer', { method: 'POST' });
-    const data = await response.json();
-
-    const { elapsedSeconds, durationSeconds, elapsedTime, remainingTime, songHasChanged } = data;
-    const pixelProportion = 450 * elapsedSeconds / durationSeconds;
-
-    // Update time display
-    document.getElementById("media-time-elapsed").textContent = elapsedTime;
-    document.getElementById("media-time-remaining").textContent = remainingTime;
-
-    // Update seek bar width
-    const seekbar = document.getElementById("seekbar");
-    if (seekbar) {
-      seekbar.style.width = `${pixelProportion}px`;
-    }
-
-    // If song changed, refresh page
-    if (songHasChanged === 1) {
-      await fetch("/changesong", { method: 'POST' });
-      await fetch("/nowplaying");
-      window.location.reload(); // reloads current page
-    }
-
-  } catch (error) {
-    console.error("Failed to update media timer:", error);
-  }
-}
-
-// Run every second
-setInterval(updateMediaTimer, 1000);
-
 </script>
 {% endblock %}
 
@@ -194,16 +202,13 @@ setInterval(updateMediaTimer, 1000);
                 class="media-button-img"
                 id="shuffle-icon"
                 data-shuffling="{{ 'true' if now_playing.shuffle_mode else 'false' }}"
-                src="{{ url_for('static', filename='icons/controls/shuffle-on.png' if now_playing.shuffle_mode else 'icons/controls/shuffle-off.png') }}"
-                
+                src="{{ url_for('static', filename='icons/controls/shuffle-on.png' if now_playing.shuffle_mode else 'icons/controls/shuffle-off.png') }}"  
             />
         </button>
-
         <button class="media-button" onclick="rewind()">
             <img class="media-button-img" id="rewind"
                 src="{{ url_for('static', filename='icons/controls/rewind.png') }}">
         </button>
-
         <button class="media-button" onclick="playOrPause()">
             <img
                 class="media-button-img"
@@ -213,18 +218,16 @@ setInterval(updateMediaTimer, 1000);
                 alt="play/pause"
             >
         </button>
-
         <button class="media-button"  onclick="fastForward()">
             <img class="media-button-img" id="fast-forward"
                 src="{{ url_for('static', filename='icons/controls/fast-forward.png') }}">
         </button>
-
         <button class="media-button" onclick="changeRepeatMode()">
             <img
                 class="media-button-img"
                 id="repeat-icon"
                 data-repeat-mode="{{ repeat_mode }}"
-                src="{{ url_for('static', filename='icons/controls/repeat-off.png') }}"
+                src="{{ url_for('static', filename='icons/controls/repeat-all.png') }}"
                 alt="repeat"
             >
         </button>

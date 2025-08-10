@@ -2,16 +2,16 @@ import base64
 from urllib.parse import unquote
 from .data_structures import AlbumItem, SongItem
 
+def get_decoded_image_file(path_to_image):
+    encoded_image = base64.b64encode(open(path_to_image, "rb").read())
+    return "data:image/png;base64,{}".format(encoded_image.decode())
+
 
 class CardItem:
     def __init__(self, name, info, image):
         self.title = name
         self.subtitle = info
         self.img_src = image
-
-def get_decoded_image_file(path_to_image):
-    encoded_image = base64.b64encode(open(path_to_image, "rb").read())
-    return "data:image/png;base64,{}".format(encoded_image.decode())
 
 
 def make_now_playing_card(song: SongItem):

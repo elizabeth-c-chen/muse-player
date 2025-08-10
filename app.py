@@ -5,8 +5,9 @@ from flask_bootstrap import Bootstrap
 from flask import Flask, url_for, render_template, redirect, request, jsonify
 from helper.muse_player import MusePlayer
 from helper.content_generator import make_artist_cards, make_album_cards,  make_album_content, \
-   make_artist_view_cards, make_songs_table, make_now_playing_card
-
+   make_artist_view_cards, make_songs_table, make_now_playing_card, get_decoded_image_file
+from pprint import PrettyPrinter
+pp = PrettyPrinter(indent=4)
 
 
 app = Flask(__name__)
@@ -23,7 +24,7 @@ songs = db.songs
 muse_player = MusePlayer()
 
 def setup_logger(logger, output_file):
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.WARNING)
 
     stdout_handler = logging.StreamHandler(sys.stdout)
     stdout_handler.setFormatter(logging.Formatter('%(asctime)s [%(funcName)s]: %(message)s'))
@@ -126,44 +127,61 @@ def show_all_songs():
 @app.route("/nowplaying")
 def now_playing():
     current_song = muse_player.get_now_playing()
-    repeat_mode = {0: "repeat_one", 1: "repeat_none", 2: "repeat_all"}[muse_player.get_repeat_mode()]
-    is_playing = muse_player.is_playing()
-    shuffle_mode = muse_player.get_shuffle_mode()
-    
+
     return render_template(
         'now-playing-view.html',
         now_playing=current_song,
         player_content=make_now_playing_card(current_song),
         song_link_dest=url_for('show_album_view', query_param=current_song.album),
         artist_link_dest=url_for('show_artists_page', query_param=current_song.album_artist),
-        repeat_mode=repeat_mode,
-        is_playing=is_playing,
-        shuffle_mode=shuffle_mode
+        repeat_mode=muse_player.get_repeat_mode(),
+        is_playing=muse_player.is_playing(),
+        shuffle_mode=muse_player.get_shuffle_mode()
     )
 
+@app.route("/nowplaying/json")
+def now_playing_json():
+    current_song = muse_player.get_now_playing()
+    elapsed_time_formatted = muse_player.get_elapsed_and_remaining_time()["elapsed_time"]
+    remaining_time_formatted = muse_player.get_elapsed_and_remaining_time()["remaining_time"]   
 
-@app.route("/changesong", methods=['POST'])
-def change_song():
-    if request.method == "POST":
-        muse_player.autoplay_next()
-    return jsonify({"status": "success"})
+    repeat_mode_labels = {0: "repeat_none", 1: "repeat_all", 2: "repeat_one"}
+    repeat_mode = repeat_mode_labels[muse_player.get_repeat_mode()]
+
+    shuffle_mode_labels = {0: "shuffle_off", 1: "shuffle_on"}
+    shuffle_mode = shuffle_mode_labels[muse_player.get_shuffle_mode()]
+
+    return jsonify({
+        "title": current_song.title,
+        "artist": current_song.artist,
+        "album_art": get_decoded_image_file(current_song.artwork_path),
+        "elapsed": elapsed_time_formatted,
+        "remaining": remaining_time_formatted,
+        "is_playing": muse_player.is_playing(),
+        "shuffle_mode": shuffle_mode,
+        "repeat_mode": repeat_mode,
+    })
+
+
+# @app.route("/changesong", methods=['POST'])
+# def change_song():
+#     if request.method == "POST":
+#         muse_player.autoplay_next()
+#     return jsonify({"status": "success"})
 
 
 @app.route("/play", methods=['POST'])
 def bg_play():
-    muse_player.play_or_pause()
-    is_playing = muse_player.is_playing()
+    is_playing = muse_player.play_or_pause()
+    print ({"status": "success", "is_playing": is_playing})
     return jsonify({"status": "success", "is_playing": is_playing})
 
 
 @app.route("/timer", methods=['POST', 'GET'])
 def bg_time_progress():
-    time_dict = muse_player.get_elapsed_and_remaining_time()
-    #if time_dict["remainingSeconds"] <= 1:
-    #    muse_player.autoplay_next()
-    #print(logger.debug(time_dict))
-    print(logger.debug(time_dict["songHasChanged"]))
-    return time_dict
+    song_info_dict = muse_player.get_player_info()
+   # pp.pprint(song_info_dict)  # For debugging purposes
+    return jsonify(song_info_dict)
 
 
 @app.route("/rewind", methods=['POST'])
@@ -183,15 +201,18 @@ def bg_fastforward():
 @app.route("/shuffle", methods=['POST'])
 def toggle_shuffle():
     new_mode = muse_player.toggle_shuffle_mode()
-    mode_labels = {0: "shuffle_off", 1: "shuffle_on"}
-    return jsonify({"status": "success", "new_mode": mode_labels[new_mode]})
+    shuffle_mode_labels = {0: "shuffle_off", 1: "shuffle_on"}
+    pp.pprint({"status": "success", "new_mode": shuffle_mode_labels[new_mode]})
+    return jsonify({"status": "success", "new_mode": shuffle_mode_labels[new_mode]})
 
 
 @app.route("/change-repeat", methods=['POST'])
 def bg_alter_repeat_mode():
     new_mode = muse_player.toggle_repeat_mode()
-    mode_labels = {0: "repeat_one", 1: "repeat_none", 2: "repeat_all"}
-    return jsonify({"status": "success", "new_mode": mode_labels[new_mode]})
+    repeat_mode_labels = {0: "repeat_none", 1: "repeat_all", 2: "repeat_one"}
+    pp.pprint({"status": "success", "new_mode": repeat_mode_labels[new_mode]})
+    return jsonify({"status": "success", "new_mode": repeat_mode_labels[new_mode]})
+
 
 if __name__ == "__main__":
     app.run(debug=True)

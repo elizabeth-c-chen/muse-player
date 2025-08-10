@@ -41,16 +41,19 @@ setup_logger(logger, 'debug_output.log')
   
 @app.route("/")
 def show_homepage():
+    # Not yet implemented
     return redirect("/artists")
 
 
 @app.route("/playlists")
 def show_all_playlists():
+    # Not yet implemented
     return redirect("/artists")
     
 
 @app.route("/playlists/<query_param>")
 def show_playlist_page():
+    # Not yet implemented
     playlist_content =  None # TODO
     return redirect("/artists")
     # return render_template(

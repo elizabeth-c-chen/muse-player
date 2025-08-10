@@ -5,7 +5,7 @@ import ffpyplayer.tools
 from ffpyplayer.player import MediaPlayer
 from datetime import datetime
 from pytz import timezone
-from .data_structures import SongQueue, SongItem
+from .data_structures import SongQueue, SongItem, format_seconds
 from pymongo import MongoClient
 
 
@@ -22,11 +22,8 @@ artists = db.artists
 songs = db.songs
 
 def format_seconds(num_seconds):
-    minutes = int(num_seconds//60)
-    seconds = int((num_seconds/60 - minutes)*60)
-    if seconds < 10:
-        seconds = str(0) + str(seconds)
-    return f"{minutes}:{seconds}"
+    minutes, seconds = divmod(int(num_seconds), 60)
+    return f"{minutes}:{seconds:02d}"
     
 def update_num_plays(db_songs_collection, song_to_update: SongItem):
     db_songs_collection.update_one({'_id': song_to_update.song_id}, {'$inc': {'numPlays': 1}})
@@ -54,16 +51,22 @@ class MusePlayer:
             filename=self.now_playing.file_path,
             ff_opts=options
         )
+        time.sleep(0.25)  # wait for player to initialize
         self.repeat_mode = repeat_mode
         self.shuffle_mode = shuffle_mode
         # Thread 
-        self.wait_play = threading.Thread(target=self.sleeper_function, args=())
+        self.stop_thread_event = threading.Event()
+        self.wait_play = threading.Thread(target=self.sleeper_function)
+        self.wait_play.start()
+
         # If repeat mode is changed during playback, this will update and inform the next player
         self.next_repeat_mode = repeat_mode
         self.next_player = None
         self.next_song = None
         self.song_has_changed = 0
         self.set_next_song()
+        self.last_song = None  
+
         
     def get_player(self):
         return self.player
@@ -87,28 +90,32 @@ class MusePlayer:
         return self.song_has_changed
     
     def get_elapsed_and_remaining_time(self):
+        meta = self.get_player().get_metadata()
+        duration = meta.get('duration') if meta else None
+        if duration is None:
+            # Metadata not ready yet, return defaults or zeros
+            return {
+                'songHasChanged': self.get_song_has_changed(),
+                'elapsedTime': "0:00",
+                'remainingTime': "0:00",
+                'elapsedSeconds': 0,
+                'remainingSeconds': 0,
+                'durationSeconds': 0
+            }
+        
         elapsed = self.get_player().get_pts()
-        duration = self.get_player().get_metadata()['duration']
-        remaining = duration - elapsed
+        remaining = duration - elapsed if elapsed is not None else duration
+        
         return {
             'songHasChanged': self.get_song_has_changed(),
-            'elapsedTime': format_seconds(elapsed),
-            'remainingTime': format_seconds(remaining),
-            'elapsedSeconds': elapsed, 
-            'remainingSeconds': remaining, 
+            'elapsedTime': format_seconds(elapsed) if elapsed is not None else "0:00",
+            'remainingTime': format_seconds(remaining) if remaining is not None else "0:00",
+            'elapsedSeconds': elapsed if elapsed is not None else 0,
+            'remainingSeconds': remaining if remaining is not None else 0,
             'durationSeconds': duration
         }
 
-    def sleeper_function(self):
-        play_counted = False
-        while self.get_player().get_metadata()['duration'] - self.get_player().get_pts() > 3:
-            if play_counted is False and self.get_player().get_pts() / self.get_player().get_metadata()['duration'] > 0.65:
-                play_counted = update_num_plays(songs, self.get_now_playing())
-            time.sleep(2)
-        #self.autoplay_next()
-       # if self.get_player().get_metadata()['duration'] - self.get_player().get_pts() < 0.5:
-       #     return
-        
+
     def seek_forward(self):
         if self.player.get_pause() is False:
             self.player.seek(pts=10, relative=True)
@@ -149,12 +156,12 @@ class MusePlayer:
             filename=song.file_path,
             ff_opts=options
         )
+        time.sleep(0.25) # wait for player to initialize
         return new_player
     
     def play_or_pause(self):
         """Function triggered by the play/pause media control button"""
-        if self.player.get_pause() is True and self.player.get_pts() < 1:
-            self.wait_play.start()
+        if self.player.get_pause() is True: # and self.player.get_pts() == 0.25:
             self.player.set_pause(False)
         elif self.player.get_pause() is True and self.player.get_pts() > 0.0:
             self.player.set_pause(False)
@@ -175,23 +182,90 @@ class MusePlayer:
         time.sleep(2)
        # print(next_song.title, next_song.artist)
         self.song_has_changed = 0
-        
+    
+    def sleeper_function(self):
+        play_counted = False
+        while not self.stop_thread_event.is_set():
+            meta = self.player.get_metadata()
+            duration = meta.get('duration') if meta else None
+            elapsed = self.player.get_pts() if self.player else None
+
+            if duration is None or elapsed is None:
+                # Metadata not ready yet, wait a bit and retry
+                self.stop_thread_event.wait(1)
+                continue
+
+            if duration - elapsed > 3:
+                if not play_counted and elapsed / duration > 0.65:
+                    update_num_plays(songs, self.now_playing)
+                    play_counted = True
+            else:
+                break
+
+            self.stop_thread_event.wait(2)
+
+
+    def stop_playback_monitor(self):
+        self.stop_thread_event.set()
+        if self.wait_play.is_alive():
+            self.wait_play.join()
+
     def autoplay_next(self):
-        """
-        ATTENTION @me 
-        autoplay function is broken
-        wait_play issue
-        problem w/ threading/sleeper function 
-        creating next_player
-        #TODO go here first
-        """
-        self.song_has_changed = 1 # will trigger page reload via javascript
+        self.song_has_changed = 1
+        # Stop current monitor thread cleanly
+        self.stop_playback_monitor()
+
+        if self.player:
+            self.last_song = self.now_playing
+            self.player.close_player()
+        
+        
         self.player = self.next_player
         self.now_playing = self.next_song
-        self.wait_play = threading.Thread(target=self.sleeper_function, args=())
+
+        # Clear the event and restart the monitor thread
+        self.stop_thread_event.clear()
+        self.wait_play = threading.Thread(target=self.sleeper_function)
         self.wait_play.start()
+
         self.player.set_pause(False)
         self.set_next_song()
+
+
+    #     def sleeper_function(self):
+    #     play_counted = False
+    #     while self.get_player().get_metadata()['duration'] - self.get_player().get_pts() > 3:
+    #         if play_counted is False and self.get_player().get_pts() / self.get_player().get_metadata()['duration'] > 0.65:
+    #             play_counted = update_num_plays(songs, self.get_now_playing())
+    #         time.sleep(2)
+    #     #self.autoplay_next()
+    #    # if self.get_player().get_metadata()['duration'] - self.get_player().get_pts() < 0.5:
+    #    #     return
+
+    # def autoplay_next(self):
+    #     """
+    #     ATTENTION @me 
+    #     autoplay function is broken
+    #     wait_play issue
+    #     problem w/ threading/sleeper function 
+    #     creating next_player
+    #     #TODO go here first
+    #     """
+    #     self.song_has_changed = 1  # will trigger page reload via javascript
+        
+    #     if self.player:
+    #         self.last_song = self.now_playing
+    #         self.player.close_player()  # close the current player to free resources
+        
+    #     self.player = self.next_player
+    #     self.now_playing = self.next_song
+        
+    #     # Restart the playback monitoring thread (you'll want to fix threading, see later)
+    #     self.wait_play = threading.Thread(target=self.sleeper_function)
+    #     self.wait_play.start()
+        
+    #     self.player.set_pause(False)
+    #     self.set_next_song()
 
     # def switch_song(self, new_song: SongItem):
     #     new_player, options = self.make_new_player(new_song)

@@ -3,11 +3,8 @@ from datetime import datetime
 
 
 def format_seconds(num_seconds):
-    minutes = int(num_seconds//60)
-    seconds = int((num_seconds/60 - minutes)*60)
-    if seconds < 10:
-        seconds = str(0) + str(seconds)
-    return f"{minutes}:{seconds}"
+    minutes, seconds = divmod(int(num_seconds), 60)
+    return f"{minutes}:{seconds:02d}"
     
 
 # SongItem class
@@ -27,6 +24,10 @@ class SongItem:
         self.bitrate = song_entry["bitrate"]
         self.codec = song_entry["codec"]
         self.is_favorited = song_entry["isFavorited"]
+    
+    def __repr__(self):
+        return f"SongItem(title={self.title!r}, artist={self.artist!r}, duration={self.duration!r})"
+
 
 def create_album_songs_list(result_songs_list: list):
     songs_list = []
@@ -48,7 +49,11 @@ class PlaylistItem:  # akin to listnode
         self.next = None
         self.content = song_item
 
+    def __repr__(self):
+        return f"PlaylistItem(song_title={self.content.title if self.content else None})"
 
+
+# Doubly linked list functions as playlist base
 class DoublyLinkedSongList:
     def __init__(self):
         self.prev_song = PlaylistItem(None)  # pseudo-node
@@ -72,8 +77,8 @@ class DoublyLinkedSongList:
     def insert_first(self, item):
         item.prev = self.prev_song
         item.next = self.prev_song.next
+        self.prev_song.next.prev = item
         self.prev_song.next = item
-        self.prev_song.next.next.prev = item
         self._length += 1
 
     def insert_middle(self, item):
@@ -82,22 +87,48 @@ class DoublyLinkedSongList:
 
     def insert_last(self, item):
         prev_item = self.next_song.prev
-        item.next = prev_item.next
-        self.next_song.prev.next = item
-        item.prev = self.next_song.prev
+        item.prev = prev_item
+        item.next = self.next_song
+        prev_item.next = item
+        self.next_song.prev = item
         self._length += 1
 
+
     def remove(self, item):
-        item.prev.next = item.prev.next.next
+        item.prev.next = item.next
         item.next.prev = item.prev
         self._length -= 1
 
-    def __str__(self):
-        return str(self.prev_song)
+def __str__(self):
+    titles = []
+    current = self.prev_song.next  # first real node
+    while current != self.next_song:
+        if current.content:
+            titles.append(current.content.title)
+        else:
+            titles.append("None")
+        current = current.next
+    return " <-> ".join(titles)
+
+def __repr__(self):
+    titles = []
+    current = self.prev_song.next
+    count = 0
+    max_preview = 5  # limit how many song titles to show
+    while current != self.next_song and count < max_preview:
+        if current.content:
+            titles.append(current.content.title)
+        else:
+            titles.append("None")
+        current = current.next
+        count += 1
+    more = "" if current == self.next_song else "..."
+    return f"<DoublyLinkedSongList length={self._length}, songs=[{', '.join(titles)}{more}]>"
+
 
 
 class Playlist:
-    def __init__(self, title=f"New Playlist {datetime.now()}"):
+    def __init__(self, title=f"New Playlist - {datetime.now()}"):
         self.title = title
         self.map = {}
         self.songs_list = DoublyLinkedSongList()
@@ -114,10 +145,9 @@ class Playlist:
 
     # Add to bottom of playlist
     def append_song(self, song_item: SongItem):
-        item_to_add = PlaylistItem(self.final_index, song_item)
+        item_to_add = PlaylistItem(song_item)
         if song_item.song_id not in self.map:
             self.map[song_item.song_id] = [item_to_add]
-            self.songs_list.insert_last(item_to_add)
             self.songs_list.insert_last(item_to_add)
             self.final_index += 1
             return 0  # Success code
@@ -141,11 +171,30 @@ class Playlist:
         Return all song_id, song_item pairs in order.
         """
         kv_pairs = []
-        curr_song = self.songs_list.prev_song
-        while curr_song.content is not None:
+        curr_song = self.songs_list.prev_song.next
+        while curr_song != self.songs_list.next_song:
             kv_pairs.append(curr_song.content)
             curr_song = curr_song.next
         return kv_pairs
+    
+    def __str__(self):
+        return f"Playlist(title={self.title!r}, total_songs={len(self)})"
+
+    def __repr__(self):
+        max_preview = 5
+        titles = []
+        current = self.songs_list.prev_song.next
+        count = 0
+        while current != self.songs_list.next_song and count < max_preview:
+            if current.content:
+                titles.append(current.content.title)
+            else:
+                titles.append("None")
+            current = current.next
+            count += 1
+        more = "" if current == self.songs_list.next_song else "..."
+        return f"<Playlist title={self.title!r}, total_songs={len(self)}, songs=[{', '.join(titles)}{more}]>"
+
 
 
 class SongQueue:

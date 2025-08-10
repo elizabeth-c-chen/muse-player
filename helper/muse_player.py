@@ -136,7 +136,7 @@ class MusePlayer:
             self.shuffle_mode = 1 # off to on
         elif self.shuffle_mode == 1: # on
             self.shuffle_mode = 0  # on to off
-        return self.shuffle_mode
+        return self.get_shuffle_mode()  # return so frontend can display the new state
     
     def toggle_repeat_mode(self):
         if self.repeat_mode == 0: # no repeat / same as repeat all for now
@@ -145,7 +145,7 @@ class MusePlayer:
             self.repeat_mode = 2  # 'all' → 'one'
         elif self.repeat_mode == 2: # repeat one 
             self.repeat_mode = 0  # 'one' → 'none'
-        return self.repeat_mode  # return it so frontend can display the new state
+        return self.get_repeat_mode()  # return so frontend can display the new state
 
     # Create player for a given song (used only after initialization)
     def make_new_player(self, song: SongItem):
@@ -179,9 +179,8 @@ class MusePlayer:
                 rand_song = songs.aggregate([{"$sample": {"size": 1}}]).next()
                 next_song = SongItem(rand_song)
         elif self.repeat_mode == 2: # repeat current song
-            next_song = self.now_playing
+            next_song = self.now_playing  # repeat the current song
         self.next_player = self.make_new_player(next_song)
-        self.next_player.set_pause(True)  # always start next player paused
         self.next_song = next_song
     
     def sleeper_function(self):

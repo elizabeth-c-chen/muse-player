@@ -1,18 +1,22 @@
 {% extends "base-two-col.html" %}
+
+{% block title_content %}
+<h1 class="top-big-title"><a href="/songs">(music) elizabethchen@Elizabeths-MacBook-Pro all_songs %</a></h1>
+{% endblock %}
+
 {% block main_content %}
-<a href="/songs"><h2>All Songs</h2></a>
-<hr>
+
 <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
-                <td class="song-entry-field display-6" style="text-align: left; width: 7%;"><b>Play</b></td>
-                <td class="song-entry-field display-6" style="text-align: left; width: 30%;"><b>Title</b></td>
-                <td class="song-entry-field display-6" style="text-align: left; width: 18%;"><b>Artist</b></td>
-                <td class="song-entry-field display-6" style="text-align: right; width: 18%;"><b>Album</b></td>
-                <td class="song-entry-field display-6" style="text-align: right; width: 9%;"><b>Duration</b></td>
-                <td class="song-entry-field display-6" style="text-align: right; width: 9%;"><b>Plays</b></td>
-                <td class="song-entry-field display-6" style="text-align: right; width: 9%"><b>Loved</b></td>
+                <td class="song-entry-field display-6" style="text-align: left; width: 7%;"><b>play</b></td>
+                <td class="song-entry-field display-6" style="text-align: left; width: 30%;"><b>title</b></td>
+                <td class="song-entry-field display-6" style="text-align: left; width: 18%;"><b>artist</b></td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 18%;"><b>album</b></td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 9%;"><b>duration</b></td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 9%;"><b>plays</b></td>
+                <td class="song-entry-field display-6" style="text-align: right; width: 9%"><b>loved</b></td>
             </tr>
         </thead>
         <tbody>

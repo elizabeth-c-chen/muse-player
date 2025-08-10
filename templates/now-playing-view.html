@@ -153,14 +153,47 @@ function toggleShuffle() {
         console.error("Error updating shuffle mode:", error);
     });
 }
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const repeatIcon = document.getElementById("repeat-icon");
+  const mode = "{{ repeat_mode }}";
+  const iconMap = {
+    "repeat_none": "/static/icons/controls/repeat-off.png",
+    "repeat_all": "/static/icons/controls/repeat-all.png",
+    "repeat_one": "/static/icons/controls/repeat-one-on.png"
+  };
+  if (repeatIcon && mode in iconMap) {
+    repeatIcon.src = iconMap[mode];
+  }
+});
+
+
+document.addEventListener("DOMContentLoaded", () => {
+  const playPauseIcon = document.getElementById("play-pause-icon");
+  const isPlaying = playPauseIcon?.dataset?.playing === "true";
+  playPauseIcon.src = isPlaying
+    ? "/static/icons/controls/pause.png"
+    : "/static/icons/controls/play.png";
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const shuffleIcon = document.getElementById("shuffle-icon");
+  const isShuffling = shuffleIcon?.dataset?.shuffling === "true";
+  shuffleIcon.src = isShuffling
+    ? "/static/icons/controls/shuffle-on.png"
+    : "/static/icons/controls/shuffle-off.png";
+});
+
 </script>
 {% endblock %}
 
+
+{% block title_content %}
+<h1 class="top-big-title"><a href="/nowplaying">(music) elizabethchen@Elizabeths-MacBook-Pro now_playing %</a></h1>
+{% endblock %}
+
 {% block main_content %}
-<a href="/nowplaying">
-    <h2>Now Playing</h2>
-</a>
-<hr>
 <div class="now-playing-card">
     <img class="card-img-top d-block" id="now-playing-artwork" src="{{ player_content.img_src }}">
     <div class="media-info-container">

@@ -109,6 +109,14 @@ a.player-subtitle {
     font-size: 2vw;
 }
 
+.ls-library-title {
+    margin: 1rem;
+}
+
+.top-big-title {
+    margin: 1rem;
+}
+
 .progress {
     margin-top: 2.5%;
     margin-bottom: 2.5%;
@@ -116,7 +124,10 @@ a.player-subtitle {
     height: 1.5vw !important;
     width: 450px;
     display: block;
-    background-color: rgba(51, 255, 0, 0.589);
+    background-color: rgba(51, 255, 0, 0.3);
+    position: relative; 
+    border-radius: 2px;
+    /* overflow: hidden; */
 }
 
 #seekbar.progress-bar {
@@ -125,6 +136,9 @@ a.player-subtitle {
     display: block;
     margin-right: 8%;
     background-color: #4af626;
+    /* left: 0;
+    top: 0; */
+    border-radius: 2px; 
     /* background-color: black; */
     /* color: #4af626; */
     /* background: #4af626; */
@@ -133,20 +147,7 @@ a.player-subtitle {
 }
 
 
-/* .progress {
-    margin-top: 2.5%;
-    margin-bottom: 2.5%;
-    font-size: 2vw;
-    height: 1.5vw !important;
-    width: 450px;
-    display: block;
-    background-color: rgba(51, 255, 0, 0.3); 
-    position: relative; 
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-#seekbar.progress-bar {
+/* #seekbar.progress-bar {
     width: 0;
     height: 100%; 
     background-color: #4af626;
@@ -155,8 +156,7 @@ a.player-subtitle {
     left: 0;
     top: 0;
     border-radius: 4px;
-} */
-
+}  */
 body {
     margin: 0;
     font-family: "Anonymous Pro", monospace;
@@ -165,7 +165,7 @@ body {
     line-height: 1.1;
     color: #bebebe;
     text-align: left;
-    /* background-color: #060606; */
+    background-color: #060606;
 }
 
 a {
@@ -225,7 +225,8 @@ td.card-cell {
     /* max-height: 240px;
     END Control image sizing */
     background: var(--bs-table-bg);
-    margin-right: 7.5px;
+    margin-right: 3px;
+    margin-left: 3px;
     margin-bottom: auto;
     /* margin-left: 0.25rem; */
     /* margin-right: 0.75rem; Padding on all sides of card image */
@@ -318,7 +319,7 @@ td.song-entry-field {
 .regular-info-text {
     font-size: 0.95vw;
     color: white;
-    line-height: 2.5rem;
+    line-height: 1rem;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -374,7 +375,7 @@ td.song-entry-field {
 
 h1,
 .h1 {
-    font-size: 1.5vw;
+    font-size: 2.5vw;
     color: #4af626;
 }
 
@@ -417,19 +418,6 @@ h6,
     border-radius: 0.25rem;
 }
 
-/* .nav-tabs .nav-link:hover,
-.nav-pills .nav-link:hover {
-    background-color: rgba(0, 37, 2, 0.836);
-} */
-
-/* .nav-tabs .nav-link.disabled,
-.nav-tabs .nav-link.disabled:hover,
-.nav-pills .nav-link.disabled,
-.nav-pills .nav-link.disabled:hover {
-    background-color: transparent;
-    color: rgba(0, 37, 2, 0.836);
-} */
-
 .nav-tabs .nav-link.active,
 .nav-pills .nav-link.active {
     background-color: #4af626;
@@ -461,3 +449,18 @@ h6,
     background-color: transparent;
 }
 
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-image: linear-gradient(#17082e 0, #1a0933 7%, #1a0933 80%, #0c1f4c 100%);
+  text-shadow: 0 0 1px rgba(50,251,226,.3), 0 0 2px rgba(50,251,226,.3), 0 0 5px rgba(50,251,226,.2);
+  min-height: 100vh;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+
+}

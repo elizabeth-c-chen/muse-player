@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
-    <title>Muse Player</title>
+    <title>muse player</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon/favicon.png') }}" type="image/x-icon">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom-styling.css') }}">
@@ -18,18 +18,22 @@
     <br>
     <div class="container">
         <div class="row">
-            <div class="col-sm-2">
-                <h2>Library</h2>
-                <hr>
+            {% block title_content %}
+            {% endblock %}
+        </div>
+        <div class="row">
+            <div class="col-sm-3 col-md-2 col-lg-2">
+                <h3 class="ls-library-title"> ls -l ~/library/ </h3>
+                <!-- <hr> -->
                 <ul class="nav nav-pills flex-column nav-fill">
-                    <li class="nav-item"><a class="nav-link" href="/playlists">Playlists</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/artists">Artists</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/albums">Albums</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/songs">Songs</a></li>
-                    <li class="nav-item"><a class="nav-link" href="/nowplaying">Now Playing</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/playlists">playlists</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/artists">artists</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/albums">albums</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/songs">songs</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/nowplaying">now_playing</a></li>
                 </ul>
             </div>
-            <div class="col-md-10">
+            <div class="col-sm-9 col-md-10 col-lg-10">
                 {% block main_content %}
                 {% endblock %}
             </div>

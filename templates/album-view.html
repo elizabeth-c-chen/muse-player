@@ -1,7 +1,10 @@
 {% extends "base-two-col.html" %}
+
+{% block title_content %}
+<h1 class="top-big-title"><a href="/artists/{{ album.artist }}">(music) elizabethchen@Elizabeths-MacBook-Pro {{ album.artist }}/{{ album.title }} %</a></h1>
+{% endblock %}
+
 {% block main_content %}
-<a href="/artists/{{ album.artist }}"><h2>{{ album.title }} – {{ album.artist }}</h2></a>
-<hr>
 <div class="row">
     <div class="col-sm-4">
         <img class="album-artwork" src="{{ album.cover_art }}">
@@ -11,12 +14,12 @@
             <table class="table">
                 <thead>
                     <tr>
-                        <td class="song-entry-field display-6" style="text-align: center; width:9%;"><b>Play</b></td>
-                        <td class="song-entry-field display-6" style="text-align: right; width: 12%;"><b>Track #</b></td>
-                        <td class="song-entry-field display-6" style="text-align: left; width: 40%;"><b>Title</b></td>
-                        <td class="song-entry-field display-6" style="text-align: right; width: 15%;"><b>Duration</b></td>
-                        <td class="song-entry-field display-6" style="text-align: right; width: 11%;"><b>Plays</b></td>
-                        <td class="song-entry-field display-6" style="text-align: right; width: 13%;"><b>Loved</b></td>
+                        <td class="song-entry-field display-6" style="text-align: center; width:9%;"><b>play</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 12%;"><b>track #</b></td>
+                        <td class="song-entry-field display-6" style="text-align: left; width: 40%;"><b>title</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 15%;"><b>duration</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 11%;"><b>plays</b></td>
+                        <td class="song-entry-field display-6" style="text-align: right; width: 13%;"><b>loved</b></td>
                     </tr>
                 </thead>
                 <tbody>
